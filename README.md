@@ -1,57 +1,40 @@
-# Reddit Text-to-Speech Bot
-
-This script uses the Reddit API and a third-party text-to-speech service to create audio files from the top posts of a specified subreddit.
+# Reddit Video Creator
+This Python script allows you to create videos from top posts on a subreddit, using text-to-speech and a collection of videos in a directory. The resulting video will contain the text from the post, spoken by a virtual assistant, with a background video.
 
 ## Requirements
+You need to have Python 3.x installed on your system to run this script. Additionally, you need to install the following Python modules:
 
-- Python 3.x
-- PRAW (Python Reddit API Wrapper)
+- PRAW
 - requests
+- moviepy
+- speech_recognition
 
-## Setup
+To install them, use the following command:
 
-1. Clone the repository or download the files.
-2. Install the required packages using pip: `pip install -r requirements.txt`
-3. Create a Reddit app and obtain API credentials. See [these instructions](https://github.com/reddit-archive/reddit/wiki/OAuth2-Quick-Start-Example#first-steps) for more information.
-4. Set the `client_id`, `client_secret`, `password`, `user_agent`, and `username` variables in the `main.py` file to your own API credentials.
-5. Set the `subreddit_name` variable to the name of the subreddit you want to search.
-6. (Optional) Adjust the `time_filter` and `limit` parameters in the `posts` variable to change the search criteria.
-7. Run the script using `python main.py`
+pip install praw requests moviepy SpeechRecognition
+
 
 ## Usage
+1. Clone this repository to your local machine.
+2. Create a Reddit app on the Reddit website. This will give you a client_id and a client_secret.
+3. Open `reddit_video_creator.py` and enter your `client_id`, `client_secret`, `username`, `password`, and `user_agent` in the appropriate fields.
+4. Define the subreddit you want to get posts from by changing the `subreddit_name` variable.
+5. Run the script using the following command:
 
-1. The script will search the specified subreddit for top posts based on the `time_filter` and `limit` parameters.
-2. For each post, the script will create a text file and a corresponding audio file using the post's title, body, and author information.
-3. The audio files will be saved in the `posts` directory.
 
-## Code Description
+This will create a video for each of the top posts on the subreddit, using a random video from the videos directory as a background.
 
-The script uses the PRAW package to interact with the Reddit API and the requests package to make HTTP requests to a third-party text-to-speech service. The script defines two functions:
+## How it works
+The script uses the PRAW (Python Reddit API Wrapper) library to access Reddit's API and retrieve the top posts from a subreddit. For each post, it performs the following steps:
 
-### `createPostTextFile`
+1. Use text-to-speech to convert the post's text into an MP3 file.
+2. Choose a random video from the videos directory and concatenate it with the MP3 file using the moviepy library.
+3. Save the resulting video as an MP4 file.
 
-This function creates a text file with post information for text-to-speech processing. It takes the following parameters:
+## Limitations
+- The script only works with subreddits that allow text posts.
+- The script uses a fixed set of voice and video files, so the output videos may not be very diverse. You can add your own voice and video files to the `voices` and `videos` directories, respectively, to increase the variety.
+- The quality of the text-to-speech output may not be very good, especially for longer posts. You can experiment with different text-to-speech services to get better results.
 
-- `title`: The title of the post.
-- `body`: The body of the post.
-- `author`: The name of the post's author.
-- `post_id`: The unique ID of the post.
-- `input_text`: The text to be used for text-to-speech processing.
-
-### `createTTS`
-
-This function generates a text-to-speech audio file using a third-party service. It takes the following parameters:
-
-- `title`: The title of the post.
-- `body`: The body of the post.
-- `author`: The name of the post's author.
-- `post_id`: The unique ID of the post.
-- `input_text`: The text to be used for text-to-speech processing.
-
-The function sends an HTTP request to the text-to-speech service with the input text and speaker ID. The response is then decoded and written to an audio file.
-
-## Acknowledgments
-
-- [PRAW documentation](https://praw.readthedocs.io/en/stable/)
-- [Requests documentation](https://docs.python-requests.org/en/master/)
-- [How to Generate Speech from Text with Python](https://www.twilio.com/blog/generate-speech-from-text-with-python)
+## Disclaimer
+This script is for educational purposes only. Please respect Reddit's API rules and do not use this script to spam or harass Reddit users.
