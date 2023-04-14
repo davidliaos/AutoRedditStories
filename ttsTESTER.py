@@ -4,8 +4,8 @@ import requests, base64, random, os
 max_length = 300
 
 # Set the input and output file paths
-input_file = "1281fyf.txt"
-output_file = "1281fyf.mp3"
+input_file = "11sv6o7.txt"
+output_file = "11sv6o7.mp3"
 
 # Read the input text from file
 with open(input_file, "r") as f:
@@ -15,7 +15,7 @@ with open(input_file, "r") as f:
 input_chunks = [input_text[i:i+max_length] for i in range(0, len(input_text), max_length)]
 
 # Set the speaker ID
-speaker_id = "en_us_002"
+speaker_id = "en_us_010"
 
 # Set the API endpoint and headers
 url = "https://api22-normal-c-useast1a.tiktokv.com/media/api/text/speech/invoke/"
