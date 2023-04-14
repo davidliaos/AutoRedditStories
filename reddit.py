@@ -2,6 +2,14 @@ import praw
 import os
 import base64
 import requests
+import random
+import moviepy
+import speech_recognition as sr
+from moviepy.editor import *
+from moviepy.video.tools.subtitles import SubtitlesClip
+from moviepy.video.io.VideoFileClip import VideoFileClip
+from moviepy.editor import VideoFileClip, AudioFileClip, concatenate_videoclips
+
 from pathlib import Path
 if not os.path.exists("posts"):
     os.makedirs("posts")
@@ -17,16 +25,17 @@ reddit = praw.Reddit(
 
 # Define subreddit to search and get top posts from past day
 subreddit_name = "AmITheAsshole"
-posts = reddit.subreddit(subreddit_name).top(time_filter="month", limit=3)
+posts = reddit.subreddit(subreddit_name).top(time_filter="week", limit=3)
 
 # Define functions
 
 def createTTS(post_id):
     # Limit of 300 characters per request.
     max_length = 300
-    input_file = f"{post_id}.txt"
+    input_file = os.path.join("posts", f"{post_id}.txt")
     output_file = f"{post_id}.mp3"
-    path = Path("posts") / output_file
+
+
     # Split the input text into chunks of maximum length 300 characters
     input_chunks = [input_text[i:i+max_length] for i in range(0, len(input_text), max_length)]
 
@@ -69,13 +78,31 @@ def createTTS(post_id):
     # Concatenate the audio data from all the chunks
     concatenated_audio_data = b"".join(audio_data_list)
 
-    with open(output_file, "wb") as f:
+    path = Path("mp3") / output_file
+    with open(path, "wb") as f:
         f.write(concatenated_audio_data)
 
     print(f"Conversion complete. MP3 file saved as {output_file}.")
 
     return concatenated_audio_data
 
+def createVideo(post_id):
+    mp3_file = os.path.join("mp3", f"{post_id}.mp3")
+    video_files = [file for file in os.listdir("videos") if file.endswith(".mov")]
+    random.shuffle(video_files)
+    
+    for mp4_file in video_files:
+        audio_clip = AudioFileClip(mp3_file)
+        video_clip = VideoFileClip(os.path.join("videos", mp4_file))
+        
+        if audio_clip.duration <= video_clip.duration:
+            video_clip = video_clip.set_duration(audio_clip.duration)
+            final_clip = video_clip.set_audio(audio_clip)
+            final_clip.write_videofile(os.path.join("mp4", f"{post_id}.mp4"), fps=24,codec = 'libx264',bitrate='5000k')
+            
+            return
+        
+    print("No video found for the given audio duration.")
 
     
 
@@ -92,6 +119,71 @@ def createPostTextFile(title, body, author, post_id, input_text):
 
     print(f"Saved post with ID {post_id} to {path}")
 
+def create_srt_file(post_id):
+    # Initialize the SpeechRecognition recognizer
+    r = sr.Recognizer()
+    input_file = os.path.join("mp4", f"{post_id}.mp4")
+
+    # Load the video and audio
+    video = VideoFileClip(input_file)
+    audio = video.audio
+
+    # Create a WAV audio file
+    audio_file = f"{post_id}.wav"
+    audio.write_audiofile(audio_file)
+
+    # Recognize the speech in the audio file
+    with sr.AudioFile(audio_file) as source:
+        audio_data = r.record(source)
+        transcript = r.recognize_google(audio_data)
+
+    # Divide the transcript into subtitle-sized chunks
+    duration = video.duration
+    num_subtitles = 50  # Change this to adjust the number of subtitles
+    subtitle_duration = duration / num_subtitles
+    subtitle_chunks = [transcript[int(i*len(transcript)/num_subtitles):int((i+1)*len(transcript)/num_subtitles)] for i in range(num_subtitles)]
+
+    # Write the SRT file
+    with open(os.path.join("srt", f'{post_id}.srt'), 'w') as f:
+        for i, chunk in enumerate(subtitle_chunks):
+            start_time = i * subtitle_duration
+            end_time = (i+1) * subtitle_duration
+            subtitle_text = chunk.replace('\n', ' ')
+            subtitle_text = ' '.join(subtitle_text.split())
+            f.write(f"{i+1}\n{format_time(start_time)} --> {format_time(end_time)}\n{subtitle_text}\n\n")
+
+
+def format_time(seconds):
+    h, m, s = 0, 0, 0
+    ms = int(seconds * 1000)
+    s, ms = divmod(ms, 1000)
+    m, s = divmod(s, 60)
+    h, m = divmod(m, 60)
+    return '{:02d}:{:02d}:{:02d},{:03d}'.format(int(h), int(m), int(s), int(ms))
+
+def add_subtitles(post_id):
+    mp4_file_path = f"mp4/{post_id}.mp4"
+    srt_file_path = f"srt/{post_id}.srt"
+
+    # Load the video file
+    video_clip = VideoFileClip(mp4_file_path)
+
+    # Load the subtitle file
+    subtitle_generator = lambda txt: TextClip(txt, fontsize=74, font='Arial', color='white')
+    subtitles = SubtitlesClip(srt_file_path, subtitle_generator)
+
+    # Set the subtitles position and duration
+    subtitles = subtitles.set_position(("center", "center")).set_duration(video_clip.duration)
+
+    # Combine the video clip and subtitles clip
+    final_clip = CompositeVideoClip([video_clip, subtitles])
+
+    # Save the final clip
+    if not os.path.exists("results"):
+        os.makedirs("results")
+    final_clip.write_videofile(f"results/subtitled{post_id}.mp4")
+
+
 # Iterate through each post and create TTS audio and text files
 for post in posts:
     title = post.title
@@ -102,10 +194,11 @@ for post in posts:
         # Define input text for TTS
     input_text = f"{title} by {author}  {body}"
 
-
     # Call function to create text file for the post
     createPostTextFile(title, body, author, post_id,input_text)
     createTTS(post_id)
-
+    createVideo(post_id)
+    create_srt_file(post_id)
+    add_subtitles(post_id)
     # Call function to generate TTS audio file
     #createTTS(title, body, author, post_id, input_text)
