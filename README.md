@@ -24,7 +24,7 @@ pip install praw requests moviepy SpeechRecognition
 
 This will create a video for each of the top posts on the subreddit, using a random video from the videos directory as a background.
 
-How it works
+## How it works
 The script uses the PRAW (Python Reddit API Wrapper) library to access Reddit's API and retrieve the top posts from a subreddit. For each post, it performs the following steps:
 
 Use text-to-speech to convert the post's text into an MP3 file.
