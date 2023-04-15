@@ -40,6 +40,11 @@ The quality of the text-to-speech output may not be very good, especially for lo
 - The script uses a fixed set of voice and video files, so the output videos may not be very diverse. You can add your own voice and video files to the `voices` and `videos` directories, respectively, to increase the variety.
 - The quality of the text-to-speech output may not be very good, especially for longer posts. You can experiment with different text-to-speech services to get better results.
 
+## Known Issues
+- TTS sometimes does not work and only returns a random few chunks as a mp3.
+- Captions sometimes get cut off and are inaccurate at times, currently using CapCut's auto captions.
+- Uploading does not work, cannot figure out how to handle different folders, may just create seperate functions for each.
+
 ## Disclaimer
 1. This script does not automatically upload the videos as that would breach TikTok's TOS, therefore each video must be manually reviewed and manually uploaded.
 2.This script is for educational purposes only. Please respect Reddit's API rules and do not use this script to spam or harass Reddit users.
