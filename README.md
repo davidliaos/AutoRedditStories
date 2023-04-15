@@ -41,4 +41,5 @@ The quality of the text-to-speech output may not be very good, especially for lo
 - The quality of the text-to-speech output may not be very good, especially for longer posts. You can experiment with different text-to-speech services to get better results.
 
 ## Disclaimer
-This script is for educational purposes only. Please respect Reddit's API rules and do not use this script to spam or harass Reddit users.
+1. This script does not automatically upload the videos as that would breach TikTok's TOS, therefore each video must be manually reviewed and manually uploaded.
+2.This script is for educational purposes only. Please respect Reddit's API rules and do not use this script to spam or harass Reddit users.
