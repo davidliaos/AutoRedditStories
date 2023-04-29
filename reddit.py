@@ -4,7 +4,6 @@ import os
 import base64
 import requests
 import random
-import os
 import sys
 import moviepy
 import speech_recognition as sr
@@ -32,6 +31,8 @@ if not os.path.exists("mp3"):
 if not os.path.exists("mp4"):
     os.makedirs("mp4")
 
+if not os.path.exists("wav"):
+    os.makedirs("wav")
 
 # Set up Reddit API credentials
 reddit = praw.Reddit(
@@ -43,8 +44,8 @@ reddit = praw.Reddit(
 )
 
 # Define subreddit to search and get top posts from past day
-subreddit_name = "Confessions" #Confessions #ProRevenge #AmITheAsshole
-posts = reddit.subreddit(subreddit_name).top(time_filter="month", limit=10)
+subreddit_name = "AmITheAsshole" #Confessions #ProRevenge #AmITheAsshole
+posts = reddit.subreddit(subreddit_name).top(time_filter="week", limit=30)
 
 # Define functions
 
@@ -53,7 +54,6 @@ def createTTS(post_id):
     max_length = 300
     input_file = os.path.join("posts", f"{post_id}.txt")
     output_file = f"{post_id}.mp3"
-
 
     # Split the input text into chunks of maximum length 300 characters
     input_chunks = [input_text[i:i+max_length] for i in range(0, len(input_text), max_length)]
@@ -97,6 +97,10 @@ def createTTS(post_id):
     # Concatenate the audio data from all the chunks
     concatenated_audio_data = b"".join(audio_data_list)
 
+    if os.path.exists(os.path.join("mp3", output_file)):
+        print(f"Skipping MP4 creation for {post_id}. File already exists.")
+        return None
+    
     path = Path("mp3") / output_file
     with open(path, "wb") as f:
         f.write(concatenated_audio_data)
@@ -110,7 +114,10 @@ def createVideo(post_id):
     video_files = [file for file in os.listdir("videos") if file.endswith(".mov")]
     random.shuffle(video_files)
     output_file = f"{post_id}.mp4"
-    
+
+    if os.path.exists(os.path.join("mp4", output_file)):
+        print(f"Skipping MP4 creation for {post_id}. File already exists.")
+        return None
     for mp4_file in video_files:
         audio_clip = AudioFileClip(mp3_file)
         video_clip = VideoFileClip(os.path.join("videos", mp4_file))
@@ -119,7 +126,7 @@ def createVideo(post_id):
             video_clip = video_clip.set_duration(audio_clip.duration)
             final_clip = video_clip.set_audio(audio_clip)
             final_clip.write_videofile(os.path.join("mp4", f"{post_id}.mp4"), fps=24,codec = 'libx264',bitrate='5000k',threads=2)
-            #upload_to_drive(output_file,"1FOsmjDwtzOem37SqfjfPFr2LEL4PErxL")
+            upload_to_drive(output_file)
             return
         
     print("No video found for the given audio duration.")
@@ -128,7 +135,6 @@ def createVideoMov(post_id):
     mp3_file = os.path.join("mp3", f"{post_id}.mp3")
     video_files = [file for file in os.listdir("videos") if file.endswith(".mov")]
     random.shuffle(video_files)
-
     for mov_file in video_files:
         audio_clip = AudioFileClip(mp3_file)
         video_clip = VideoFileClip(os.path.join("videos", mov_file))
@@ -151,6 +157,10 @@ def createPostTextFile(title, body, author, post_id, input_text):
     filename = f"{post_id}.txt"
     path = Path("posts") / filename
 
+    if os.path.exists(os.path.join("posts", filename)):
+        print(f"Skipping TXT creation for {post_id}. File already exists.")
+        return None
+
     with open(path, "w") as file:
         file.write(input_text)
 
@@ -164,9 +174,11 @@ def create_srt_file(post_id):
     # Load the video and audio
     video = VideoFileClip(input_file)
     audio = video.audio
-
+    if os.path.exists(os.path.join("results", output_file)):
+        print(f"Skipping SRT creation for {post_id}. File already exists.")
+        return None
     # Create a WAV audio file
-    audio_file = f"{post_id}.wav"
+    audio_file = os.path.join("wav", f"{post_id}.wav")
     audio.write_audiofile(audio_file)
 
     # Recognize the speech in the audio file
@@ -188,9 +200,6 @@ def create_srt_file(post_id):
             subtitle_text = chunk.replace('\n', ' ')
             subtitle_text = ' '.join(subtitle_text.split())
             f.write(f"{i+1}\n{format_time(start_time)} --> {format_time(end_time)}\n{subtitle_text}\n\n")
-
-    #upload_to_drive(output_file,"1FOsmjDwtzOem37SqfjfPFr2LEL4PErxL")
-
 
 def format_time(seconds):
     h, m, s = 0, 0, 0
@@ -235,18 +244,18 @@ def addPostId(post_id):
     with open('post_ids.txt', 'a') as f:
         f.write(post_id + '\n')
 
-def upload_to_drive(file_name,folder_id):
+def upload_to_drive(filename):
     """Uploads the specified file to Google Drive.
 
     Args:
-        file_name (str): The name of the file to be uploaded.
+        filename (str): The name of the file to be uploaded.
 
     Returns:
         None
     """
     SCOPES = ["https://www.googleapis.com/auth/drive.file"]
-
-    arguments = ["-f", "-fs"]
+    folder_id = "1FOsmjDwtzOem37SqfjfPFr2LEL4PErxL"
+    file_path = os.path.join("mp4", filename)
 
     try:
         creds = None
@@ -270,10 +279,10 @@ def upload_to_drive(file_name,folder_id):
         service = build("drive", "v3", credentials=creds)
 
         # create a MediaFileUpload object for the file
-        file = MediaFileUpload(file_name, mimetype="image/jpg", resumable=True)
+        file = MediaFileUpload(file_path, mimetype="video/mp4", resumable=True)
 
         # create a file resource with metadata
-        file_metadata = {"name": file_name, "parents": [folder_id]}
+        file_metadata = {"name": filename, "parents": [folder_id]}
 
         # send a request to upload the file
         uploaded_file = (
@@ -283,7 +292,7 @@ def upload_to_drive(file_name,folder_id):
         )
 
         print(
-            f'File {file_name} uploaded 😎 to Google Drive with 🆔: {uploaded_file.get("id")} ✨'
+            f'File {filename} successfully uploaded to Google Drive ID:({uploaded_file.get("id")})'
         )
 
     except HttpError as error:
@@ -296,6 +305,8 @@ for post in posts:
     body = post.selftext
     author = post.author
     post_id = post.id
+    post_url = post.url
+
 
     # Define input text for TTS
     input_text = f"{title} by {author}  {body}"
@@ -303,10 +314,13 @@ for post in posts:
     # Check if post_id already exists
     if not checkPostId(post_id):
         # Call function to create text file for the post
+            # Print the post link
+        print("Post link:", post_url)
         createPostTextFile(title, body, author, post_id,input_text)
         createTTS(post_id)
         createVideo(post_id)
         #createVideoMov(post_id)
-        create_srt_file(post_id)
+        #create_srt_file(post_id)
         #add_subtitles(post_id)
         addPostId(post_id)
+        print("----------------------------Post created successfully----------------------------")
