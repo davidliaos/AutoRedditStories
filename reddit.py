@@ -1,18 +1,37 @@
+from __future__ import print_function
 import praw
 import os
 import base64
 import requests
 import random
+import os
+import sys
 import moviepy
 import speech_recognition as sr
 from moviepy.editor import *
 from moviepy.video.tools.subtitles import SubtitlesClip
 from moviepy.video.io.VideoFileClip import VideoFileClip
 from moviepy.editor import VideoFileClip, AudioFileClip, concatenate_videoclips
-
 from pathlib import Path
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
+from googleapiclient.http import MediaFileUpload
+
+if not os.path.exists("srt"):
+    os.makedirs("srt")
+
 if not os.path.exists("posts"):
     os.makedirs("posts")
+
+if not os.path.exists("mp3"):
+    os.makedirs("mp3")
+
+if not os.path.exists("mp4"):
+    os.makedirs("mp4")
+
 
 # Set up Reddit API credentials
 reddit = praw.Reddit(
@@ -24,8 +43,8 @@ reddit = praw.Reddit(
 )
 
 # Define subreddit to search and get top posts from past day
-subreddit_name = "AmITheAsshole"
-posts = reddit.subreddit(subreddit_name).top(time_filter="week", limit=3)
+subreddit_name = "Confessions" #Confessions #ProRevenge #AmITheAsshole
+posts = reddit.subreddit(subreddit_name).top(time_filter="month", limit=10)
 
 # Define functions
 
@@ -81,7 +100,7 @@ def createTTS(post_id):
     path = Path("mp3") / output_file
     with open(path, "wb") as f:
         f.write(concatenated_audio_data)
-
+    #upload_to_drive(output_file,"1w4IUHvVJ2S_qJRCceSokCMu9IrDc5a9P")
     print(f"Conversion complete. MP3 file saved as {output_file}.")
 
     return concatenated_audio_data
@@ -90,6 +109,7 @@ def createVideo(post_id):
     mp3_file = os.path.join("mp3", f"{post_id}.mp3")
     video_files = [file for file in os.listdir("videos") if file.endswith(".mov")]
     random.shuffle(video_files)
+    output_file = f"{post_id}.mp4"
     
     for mp4_file in video_files:
         audio_clip = AudioFileClip(mp3_file)
@@ -98,13 +118,30 @@ def createVideo(post_id):
         if audio_clip.duration <= video_clip.duration:
             video_clip = video_clip.set_duration(audio_clip.duration)
             final_clip = video_clip.set_audio(audio_clip)
-            final_clip.write_videofile(os.path.join("mp4", f"{post_id}.mp4"), fps=24,codec = 'libx264',bitrate='5000k')
-            
+            final_clip.write_videofile(os.path.join("mp4", f"{post_id}.mp4"), fps=24,codec = 'libx264',bitrate='5000k',threads=2)
+            #upload_to_drive(output_file,"1FOsmjDwtzOem37SqfjfPFr2LEL4PErxL")
             return
         
     print("No video found for the given audio duration.")
 
-    
+def createVideoMov(post_id):
+    mp3_file = os.path.join("mp3", f"{post_id}.mp3")
+    video_files = [file for file in os.listdir("videos") if file.endswith(".mov")]
+    random.shuffle(video_files)
+
+    for mov_file in video_files:
+        audio_clip = AudioFileClip(mp3_file)
+        video_clip = VideoFileClip(os.path.join("videos", mov_file))
+
+        if audio_clip.duration <= video_clip.duration:
+            video_clip = video_clip.set_duration(audio_clip.duration)
+            final_clip = video_clip.set_audio(audio_clip)
+            final_clip.write_videofile(os.path.join("mov", f"{post_id}.mov"), fps=24, codec='png', bitrate='5000k')
+            return
+
+    print("No video found for the given audio duration.")
+
+
 
 def createPostTextFile(title, body, author, post_id, input_text):
     """
@@ -123,7 +160,7 @@ def create_srt_file(post_id):
     # Initialize the SpeechRecognition recognizer
     r = sr.Recognizer()
     input_file = os.path.join("mp4", f"{post_id}.mp4")
-
+    output_file = f"{post_id}.srt"
     # Load the video and audio
     video = VideoFileClip(input_file)
     audio = video.audio
@@ -152,6 +189,8 @@ def create_srt_file(post_id):
             subtitle_text = ' '.join(subtitle_text.split())
             f.write(f"{i+1}\n{format_time(start_time)} --> {format_time(end_time)}\n{subtitle_text}\n\n")
 
+    #upload_to_drive(output_file,"1FOsmjDwtzOem37SqfjfPFr2LEL4PErxL")
+
 
 def format_time(seconds):
     h, m, s = 0, 0, 0
@@ -162,9 +201,10 @@ def format_time(seconds):
     return '{:02d}:{:02d}:{:02d},{:03d}'.format(int(h), int(m), int(s), int(ms))
 
 def add_subtitles(post_id):
+    #mp4_file_path = f"mov/{post_id}.mov"
     mp4_file_path = f"mp4/{post_id}.mp4"
     srt_file_path = f"srt/{post_id}.srt"
-
+    output_file = f"{post_id}.mp4"
     # Load the video file
     video_clip = VideoFileClip(mp4_file_path)
 
@@ -181,7 +221,73 @@ def add_subtitles(post_id):
     # Save the final clip
     if not os.path.exists("results"):
         os.makedirs("results")
+    #final_clip.write_videofile(f"results/subtitled{post_id}.mov")
     final_clip.write_videofile(f"results/subtitled{post_id}.mp4")
+    #upload_to_drive(output_file,"1JDtzqDe--FNVBFMM2D8D7JH2k3nWiQGY")
+
+def checkPostId(post_id):
+    with open('post_ids.txt', 'r') as f:
+        if post_id in f.read():
+            return True
+    return False
+
+def addPostId(post_id):
+    with open('post_ids.txt', 'a') as f:
+        f.write(post_id + '\n')
+
+def upload_to_drive(file_name,folder_id):
+    """Uploads the specified file to Google Drive.
+
+    Args:
+        file_name (str): The name of the file to be uploaded.
+
+    Returns:
+        None
+    """
+    SCOPES = ["https://www.googleapis.com/auth/drive.file"]
+
+    arguments = ["-f", "-fs"]
+
+    try:
+        creds = None
+        # The file token.json stores the user's access and refresh tokens, and is
+        # created automatically when the authorization flow completes for the first
+        # time.
+        if os.path.exists("token.json"):
+            creds = Credentials.from_authorized_user_file("token.json", SCOPES)
+        # If there are no (valid) credentials available, let the user log in.
+        if not creds or not creds.valid:
+            if creds and creds.expired and creds.refresh_token:
+                creds.refresh(Request())
+            else:
+                flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
+                creds = flow.run_local_server(port=0)
+            # Save the credentials for the next run
+            with open("token.json", "w") as token:
+                token.write(creds.to_json())
+
+        # build the Drive API client
+        service = build("drive", "v3", credentials=creds)
+
+        # create a MediaFileUpload object for the file
+        file = MediaFileUpload(file_name, mimetype="image/jpg", resumable=True)
+
+        # create a file resource with metadata
+        file_metadata = {"name": file_name, "parents": [folder_id]}
+
+        # send a request to upload the file
+        uploaded_file = (
+            service.files()
+            .create(body=file_metadata, media_body=file, fields="id")
+            .execute()
+        )
+
+        print(
+            f'File {file_name} uploaded 😎 to Google Drive with 🆔: {uploaded_file.get("id")} ✨'
+        )
+
+    except HttpError as error:
+        print(f"An error occurred: {error}")
 
 
 # Iterate through each post and create TTS audio and text files
@@ -191,14 +297,16 @@ for post in posts:
     author = post.author
     post_id = post.id
 
-        # Define input text for TTS
+    # Define input text for TTS
     input_text = f"{title} by {author}  {body}"
 
-    # Call function to create text file for the post
-    createPostTextFile(title, body, author, post_id,input_text)
-    createTTS(post_id)
-    createVideo(post_id)
-    create_srt_file(post_id)
-    add_subtitles(post_id)
-    # Call function to generate TTS audio file
-    #createTTS(title, body, author, post_id, input_text)
+    # Check if post_id already exists
+    if not checkPostId(post_id):
+        # Call function to create text file for the post
+        createPostTextFile(title, body, author, post_id,input_text)
+        createTTS(post_id)
+        createVideo(post_id)
+        #createVideoMov(post_id)
+        create_srt_file(post_id)
+        #add_subtitles(post_id)
+        addPostId(post_id)
