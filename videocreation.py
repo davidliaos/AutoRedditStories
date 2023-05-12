@@ -23,7 +23,7 @@ def createVideo(post_id):
             video_clip = video_clip.set_duration(audio_clip.duration)
             final_clip = video_clip.set_audio(audio_clip)
             final_clip.write_videofile(os.path.join("mp4", f"{post_id}.mp4"), fps=24,codec = 'libx264',bitrate='5000k',threads=2)
-            upload_to_drive(output_file)
+            #upload_to_drive(output_file)
             return
         
     print("No video found for the given audio duration.")
