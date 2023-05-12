@@ -3,7 +3,7 @@ import base64
 import requests
 from pathlib import Path
 from moviepy.editor import VideoFileClip, AudioFileClip, concatenate_videoclips
-
+from textprocess import identifyUnicode
 def createTTS(post_id,input_text):
     # Limit of 300 characters per request.
     max_length = 300
@@ -64,7 +64,7 @@ def createTTS(post_id,input_text):
 
     return concatenated_audio_data
 
-def wcreateTTS(post_id):
+def wcreateTTS(post_id,input_text):
     # Limit of 300 characters per request.
     max_length = 300
     input_file = os.path.join("posts", f"{post_id}.txt")
@@ -120,6 +120,7 @@ def wcreateTTS(post_id):
         # Check for errors
         if r.status_code != 200:
             print(f"Error {r.status_code} occurred for input chunk: {input_chunk}")
+            identifyUnicode(input_chunk)  # Call the count_unicode_chars function
             exit()
 
         # Extract the audio data from the response
