@@ -7,7 +7,7 @@ from moviepy.video.io.VideoFileClip import VideoFileClip
 from moviepy.editor import VideoFileClip, AudioFileClip, concatenate_videoclips
 
 def createsrt(path, name):
-    if os.path.exists(os.path.join("srt", f"{name}.mp4")):
+    if os.path.exists(os.path.join("srt", f"{name}.srt")):
         print(f"Skipping SRT creation for {name}. File already exists.")
         return None
     file = f'./{path}/{name}.mp4'
@@ -32,9 +32,9 @@ def get_screen_size():
 def subtitle_generator(txt):
     # Define the font, size, and color of the subtitle
     font = 'Proxima Nova Bold'
-    size = 45
+    size = 47
     color = 'white'
-    stroke_width = 1
+    stroke_width = 2
     stroke_color = 'black'
 
     # Split the text into words
@@ -63,9 +63,12 @@ def subtitle_generator(txt):
             result += word
 
     # Create and return the TextClip
-    return TextClip(result, fontsize=size, font=font, color=color, stroke_width=stroke_width, stroke_color=stroke_color)
+    return TextClip(result, fontsize=size,font=font, color=color, stroke_width=stroke_width, stroke_color=stroke_color)
 
 def add_subtitles(post_id):
+    if os.path.exists(os.path.join("results", 'subtitled' +f"{post_id}.mp4")):
+        print(f"Skipping edited MP4 creation for {post_id}. File already exists.")
+        return None
     #mp4_file_path = f"mov/{post_id}.mov"
     mp4_file_path = f"mp4/{post_id}.mp4"
     srt_file_path = f"srt/{post_id}.srt"
