@@ -1,5 +1,7 @@
 import praw
 import os
+import random
+import time
 from uploader import uploadVideo
 from texttospeech import createTTS, wcreateTTS
 from subtitles import createsrt, format_time, get_screen_size, subtitle_generator, add_subtitles
@@ -7,10 +9,16 @@ from videocreation import createVideo, createVideoMov
 from textprocess import createPostTextFile, preprocessText
 
 
-
+#session id, must be changed every two months
 SESSION_ID = "98c156e53abe8c7c5452afc89a05ca18"
-TITLE = "thoughts?"
+#choices for randomlym selected captions
+TITLES = ["thoughts?", "opinions?", "what do you think?", "let's discuss"]
+#randomizes the choices
+TITLE = random.choice(TITLES)
+#list of hashtags for the post
 TAGS = ["aita", "askreddit", "redditstories","tifu","redditreadings"]
+#randomizes the order of the hashtags to seem more human
+random.shuffle(TAGS)
 USERS = []
 
 
@@ -65,9 +73,33 @@ def addPostId(post_id):
     with open('post_ids.txt', 'a') as f:
         f.write(post_id + '\n')
 
+def checkPostId(post_id):
+    """
+    Checks if a given post ID has already been logged in the text file.
+
+    Returns:
+        True if the post ID is already logged, False otherwise.
+    """
+    with open('post_ids.txt', 'r') as f:
+        for line in f:
+            if post_id in line:
+                return True
+    return False
+
+
+def addPostId(post_id):
+    """
+    Adds a post ID to the text file to mark it as processed.
+    """
+    with open('post_ids.txt', 'a') as f:
+        f.write(post_id + '\n')
+
 
 # Iterate through each post and create TTS audio and text files
 for post in posts:
+    #tracks runtime for iterations
+    start_time = time.time()
+
     title = post.title
     body = post.selftext
     author = post.author
@@ -76,7 +108,7 @@ for post in posts:
 
 
     # Define input text for TTS
-    input_text = f"{title} by {author}  {body}"
+    input_text = f"{title} {body}"
     
     # Check if post_id already exists
     if not checkPostId(post_id):
@@ -94,4 +126,15 @@ for post in posts:
         add_subtitles(post_id)
         uploadVideo(SESSION_ID, file, TITLE, TAGS, USERS)
         addPostId(post_id)
+        # record the end time
+        end_time = time.time()
+        # calculate the elapsed time and print it
+        elapsed_time = end_time - start_time
+        print(f"Elapsed time: {elapsed_time:.2f} seconds")
         print("----------------------------Post created successfully----------------------------")
+        # wait for a random interval of 1-3 minutes to seem more human
+        interval = random.randint(60, 180)
+        print(f"Waiting {interval} seconds...")
+        time.sleep(interval)
+    else:
+        print("Post ID", post_id, "has already been processed.")
