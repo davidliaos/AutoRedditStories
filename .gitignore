@@ -1,0 +1,10 @@
+posts/
+mp3/
+mp4/
+srt/
+results/
+videos/
+wav/
+venv/
+token.json
+.env 
