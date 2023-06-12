@@ -16,7 +16,6 @@ def upload_to_drive(filename):
         None
     """
     SCOPES = ["https://www.googleapis.com/auth/drive.file"]
-    folder_id = "1FOsmjDwtzOem37SqfjfPFr2LEL4PErxL"
     file_path = os.path.join("mp4", filename)
 
     try:
