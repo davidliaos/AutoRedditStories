@@ -9,4 +9,5 @@ venv/
 token.json
 .env 
 .DS_Store
-__pycache__/
+_pycache__/
+post_ids.txt
