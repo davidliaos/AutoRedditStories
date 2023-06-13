@@ -11,3 +11,8 @@ token.json
 .DS_Store
 _pycache__/
 post_ids.txt
+.gitignore
+.DS_Store
+__pycache__/googledrive.cpython-310.pyc
+__pycache__/texttospeech.cpython-310.pyc
+__pycache__/videocreation.cpython-310.pyc
