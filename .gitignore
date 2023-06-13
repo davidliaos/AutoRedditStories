@@ -8,3 +8,5 @@ wav/
 venv/
 token.json
 .env 
+.DS_Store
+__pycache__/
