@@ -15,18 +15,31 @@ def createVideo(post_id):
     if os.path.exists(os.path.join("mp4", output_file)):
         print(f"{post_id} - Skipping MP4 creation for {post_id}. File already exists.")
         return None
+    
+    audio_clip = AudioFileClip(mp3_file)
+    
+    video_clips = []
+    total_video_duration = 0
+    
     for mp4_file in video_files:
-        audio_clip = AudioFileClip(mp3_file)
         video_clip = VideoFileClip(os.path.join("videos", mp4_file))
+        video_clips.append(video_clip)
+        total_video_duration += video_clip.duration
         
-        if audio_clip.duration <= video_clip.duration:
-            video_clip = video_clip.set_duration(audio_clip.duration)
-            final_clip = video_clip.set_audio(audio_clip)
-            final_clip.write_videofile(os.path.join("mp4", f"{post_id}.mp4"), fps=24,codec = 'libx264',bitrate='5000k',threads=2)
-            #upload_to_drive(output_file)
-            return
-        
-    print("No video found for the given audio duration.")
+        if total_video_duration >= audio_clip.duration:
+            break
+    
+    if total_video_duration < audio_clip.duration:
+        print("Not enough video found for the given audio duration.")
+        return
+    
+    final_video = concatenate_videoclips(video_clips)
+    final_video = final_video.set_duration(audio_clip.duration)
+    
+    final_clip = final_video.set_audio(audio_clip)
+    final_clip.write_videofile(os.path.join("mp4", f"{post_id}.mp4"), fps=24,codec = 'libx264',bitrate='5000k',threads=2)
+    #upload_to_drive(output_file)
+    return
 
 def createVideoMov(post_id):
     mp3_file = os.path.join("mp3", f"{post_id}.mp3")
