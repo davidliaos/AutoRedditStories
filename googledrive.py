@@ -16,7 +16,6 @@ def upload_to_drive(filename):
         None
     """
     SCOPES = ["https://www.googleapis.com/auth/drive.file"]
-    folder_id = "1FOsmjDwtzOem37SqfjfPFr2LEL4PErxL"
     file_path = os.path.join("mp4", filename)
 
     try:
@@ -44,7 +43,7 @@ def upload_to_drive(filename):
         file = MediaFileUpload(file_path, mimetype="video/mp4", resumable=True)
 
         # create a file resource with metadata
-        file_metadata = {"name": filename, "parents": [folder_id]}
+        file_metadata = {"name": filename, "parents": [FOLDER_ID]}
 
         # send a request to upload the file
         uploaded_file = (
