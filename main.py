@@ -135,7 +135,7 @@ for post in posts:
         print("******Post Completed Successfully*****")
         # need to wait for tiktok uploading to be fixed.
         #uploadVideo(SESSION_ID, file, TITLE, TAGS, USERS,url_prefix = "us")
-        #addPostId(post_id)
+        addPostId(post_id)
         # record the end time
         #end_time = time.time()
         # calculate the elapsed time and print it
