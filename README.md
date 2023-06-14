@@ -1,27 +1,20 @@
 # READ 
-.gitignore didn't gitignore. Currently Uploading does not work, which is why it's commented out.
+.gitignore didn't gitignore. Currently Uploading does not work, which is why it's commented out. I am unable to understand the fix for this but please feel free to look into it.
+
 # Auto Reddit Stories
 This Python script allows you to create videos from top posts on a subreddit, using text-to-speech and a collection of videos in a directory. The resulting video will contain the text from the post, spoken by a virtual assistant, with a background video.
 
 ## Requirements
-You need to have Python 3.x installed on your system to run this script. Additionally, you need to install the following Python modules:
+You need to have Python 3.9+ installed on your system to run this project. 
 
-- PRAW
-- requests
-- moviepy
-- speech_recognition
-
-To install them, use the following command:
-
-pip install praw requests moviepy SpeechRecognition
-
+pip install -r requirements.txt
 
 ## Usage
 1. Clone this repository to your local machine.
 2. Create a Reddit app on the Reddit website. This will give you a client_id and a client_secret.
 3. Go to TikTok and get your session ID from the applications tab.
 4. Fill in your info in the .env file.
-6. Run the script
+6. Run the project
 
 
 This will create a video for each of the top posts on the subreddit, using a random video from the videos directory as a background.
