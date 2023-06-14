@@ -1,5 +1,5 @@
 git+https://github.com/abdeladim-s/subsai.git@2094df03e8d4a52c381cd3ed110762d4e813f3b1
-requests==2.28.2
+requests==2.31.0
 praw==7.7.0
 moviepy==1.0.3
 google-api-core==2.11.0
