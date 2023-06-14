@@ -33,6 +33,7 @@ def preprocessText(post_id):
     file_contents = re.sub(r'www\.\S+', '', file_contents) # Remove any links starting with www
     #removes silly unicode emojis
     file_contents = file_contents.replace('♥️', ' ')
+    file_contents = file_contents.replace('😂', ' ')
     # Write the updated contents back to the file
     with open(file_path, 'w', encoding='utf-8') as f:
         f.write(file_contents)

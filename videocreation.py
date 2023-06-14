@@ -37,7 +37,7 @@ def createVideo(post_id):
     final_video = final_video.set_duration(audio_clip.duration)
     
     final_clip = final_video.set_audio(audio_clip)
-    final_clip.write_videofile(os.path.join("mp4", f"{post_id}.mp4"), fps=24,codec = 'libx264',bitrate='5000k',threads=2)
+    final_clip.write_videofile(os.path.join("mp4", f"{post_id}.mp4"),verbose = True, fps=24,codec = 'libx264',bitrate='5000k',threads=2)
     #upload_to_drive(output_file)
     return
 
@@ -52,7 +52,7 @@ def createVideoMov(post_id):
         if audio_clip.duration <= video_clip.duration:
             video_clip = video_clip.set_duration(audio_clip.duration)
             final_clip = video_clip.set_audio(audio_clip)
-            final_clip.write_videofile(os.path.join("mov", f"{post_id}.mov"), fps=24, codec='png', bitrate='5000k')
+            final_clip.write_videofile(os.path.join("mov", f"{post_id}.mov"),verbose = True, fps=24, codec='png', bitrate='5000k')
             return
 
     print("No video found for the given audio duration.")

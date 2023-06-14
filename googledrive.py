@@ -43,7 +43,7 @@ def upload_to_drive(filename):
         file = MediaFileUpload(file_path, mimetype="video/mp4", resumable=True)
 
         # create a file resource with metadata
-        file_metadata = {"name": filename, "parents": [FOLDER_ID]}
+        file_metadata = {"name": filename, "parents": os.environ["FOLDER_ID"]}
 
         # send a request to upload the file
         uploaded_file = (

@@ -89,5 +89,5 @@ def add_subtitles(post_id):
     if not os.path.exists("results"):
         os.makedirs("results")
     
-    final_clip.write_videofile(f"results/subtitled{post_id}.mp4")
+    final_clip.write_videofile(f"results/subtitled{post_id}.mp4",verbose = False)
     #upload_to_drive(output_file,"1JDtzqDe--FNVBFMM2D8D7JH2k3nWiQGY")
