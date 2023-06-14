@@ -36,8 +36,8 @@ def createVideo(post_id):
     final_video = concatenate_videoclips(video_clips)
     final_video = final_video.set_duration(audio_clip.duration)
     
-    final_clip = final_video.set_audio(audio_clip)
-    final_clip.write_videofile(os.path.join("mp4", f"{post_id}.mp4"),verbose = True, fps=24,codec = 'libx264',bitrate='5000k',threads=2)
+    final_clip = final_video.set_audio(audio_clip) #using aac because mp3 doesnt work on mac, change to mp3 if you really need size/speed.
+    final_clip.write_videofile(os.path.join("mp4", f"{post_id}.mp4"), audio_codec='aac', verbose = True, fps=24,codec = 'libx264',bitrate='5000k',threads=2)
     #upload_to_drive(output_file)
     return
 
