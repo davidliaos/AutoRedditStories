@@ -32,18 +32,16 @@ The script uses the PRAW (Python Reddit API Wrapper) library to access Reddit's 
 Use text-to-speech to convert the post's text into an MP3 file.
 Choose a random video from the videos directory and concatenate it with the MP3 file using the moviepy library.
 Save the resulting video as an MP4 file.
-Limitations
-The script only works with subreddits that allow text posts.
-The script uses a fixed set of voice and video files, so the output videos may not be very diverse. You can add your own voice and video files to the voices and videos directories, respectively, to increase the variety.
-The quality of the text-to-speech output may not be very good, especially for longer posts. You can experiment with different text-to-speech services to get better results.
+Use Speech to Text to generate subtitles, not sure if we can use the prior script to make this more accurate.
+
+# Limitations
+This is obviously exclusively for text posts.
+
+The quality of the TTS is quite inconsistant, and occasionally varies in speed(?) 
 
 ## To-Do
 1. Limit size/length of finalized file, and split it up for TikTok
 2. Threading since transcription takes a while
-
-## Disclaimer
-1. This script does not automatically upload the videos as that would breach TikTok's TOS, therefore each video must be manually reviewed and manually uploaded.
-2.This script is for educational purposes only. Please respect Reddit's API rules and do not use this script to spam or harass Reddit users.
 
 ## Acknowledgements 
 https://github.com/abdeladim-s/subsai
