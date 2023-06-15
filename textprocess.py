@@ -27,6 +27,7 @@ def preprocessText(post_id):
     # Replace words for TTS to process easier and more consistantly.
     file_contents = file_contents.replace('TIFU', 'T.I.F.U')
     file_contents = file_contents.replace('AITA', 'A.I.T.A')
+    file_contents = file_contents.replace('A-I-T-A ', 'A.I.T.A')
     file_contents = file_contents.replace('WIBTA', 'W.I.B.T.A')
     #removes links 
     file_contents = re.sub(r'http\S+', '', file_contents) # Remove any links starting with http
@@ -79,7 +80,7 @@ def processSRT(post_id):
     file_contents = file_contents.replace('Typhoo', 'TIFU')
     file_contents = file_contents.replace('A-T-A ', 'AITA')
     file_contents = file_contents.replace('I.T.A.', 'AITA')
-    
+    file_contents = file_contents.replace('A-I-T-A ', 'AITA')
     # Replace all parentheses with empty string
     file_contents = file_contents.replace('(', '')
     file_contents = file_contents.replace(')', '')
