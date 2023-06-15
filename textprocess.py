@@ -3,11 +3,12 @@ import re
 from pathlib import Path
 
 def preprocessText(post_id):
+    
     file_path = os.path.abspath(f'posts/{post_id}.txt')
 
     with open(file_path, 'r', encoding='utf-8') as f:
         file_contents = f.read()
-
+    file_contents = removeUnicode(file_contents)
     # Replace all asterisks with empty string
     file_contents = file_contents.replace('*', '')
     
@@ -24,7 +25,7 @@ def preprocessText(post_id):
     file_contents = file_contents.replace('“', '"')
     file_contents = file_contents.replace('”', '"')
     file_contents = file_contents.replace('_', ' ')
-    # Replace words for TTS to process easier and more consistantly.
+    file_contents = file_contents.replace('…', '"')
     file_contents = file_contents.replace('TIFU', 'T.I.F.U')
     file_contents = file_contents.replace('AITA', 'A.I.T.A')
     file_contents = file_contents.replace('A-I-T-A ', 'A.I.T.A')
@@ -62,6 +63,23 @@ def preprocessString(text):
     text = text.replace('A-A-T-A', 'A.I.T.A')
 
     return text
+
+def removeUnicode(text):
+    # Create an empty list to store the individual characters of the new text
+    new_text_chars = []
+    
+    # Iterate over each character in the text
+    for char in text:
+        # Check if the character is a Unicode character
+        if ord(char) > 127:
+            # If the character is a Unicode character, skip it
+            continue
+        # If the character is not a Unicode character, add it to the new text
+        new_text_chars.append(char)
+    
+    # Combine the characters of the new text into a single string and return it
+    new_text = "".join(new_text_chars)
+    return new_text
 
 
 def processSRT(post_id):
@@ -118,6 +136,8 @@ def createPostTextFile(title, body, author, post_id, input_text):
     print(f"Saved post with ID {post_id} to {path}")
 
 def identifyUnicode(text):
+    removeUnicode(text)
+    text = removeUnicode(text)
     # Create an empty dictionary to store the count of each Unicode character
     char_counts = {}
     
@@ -141,3 +161,5 @@ def identifyUnicode(text):
             print(f"Unicode ({ord(char)}), {char}, shown ({count}) times")
     else:
         print("No Unicode characters were found outside of the ASCII range")
+
+        
