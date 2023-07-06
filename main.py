@@ -7,6 +7,7 @@ from texttospeech import createTTS, wcreateTTS
 from subtitles import createsrt, format_time, get_screen_size, subtitle_generator, add_subtitles
 from videocreation import createVideo, createVideoMov
 from textprocess import createPostTextFile, preprocessText
+from dotenv import load_dotenv
 
 #choices for randomlym selected captions
 TITLES = ["thoughts?", "opinions?", "what do you think?", "let's discuss"]
@@ -17,7 +18,7 @@ TAGS = ["aita", "askreddit", "redditstories","tifu","redditreadings"]
 #randomizes the order of the hashtags to seem more human
 random.shuffle(TAGS)
 USERS = []
-
+SESSION_ID = os.getenv('SESSION_ID')
 
 if not os.path.exists("srt"):
     os.makedirs("srt")
@@ -133,18 +134,14 @@ for post in posts:
         add_subtitles(post_id)
         print(f"{post_id} - Post created successfully")
         print("******Post Completed Successfully*****")
-        # need to wait for tiktok uploading to be fixed.
-        #uploadVideo(SESSION_ID, file, TITLE, TAGS, USERS,url_prefix = "us")
+
+        uploadVideo(SESSION_ID, file, TITLE, TAGS, USERS,)
         addPostId(post_id)
         # record the end time
-        #end_time = time.time()
+        end_time = time.time()
         # calculate the elapsed time and print it
-        #elapsed_time = end_time - start_time
-        #print(f"Elapsed time: {elapsed_time:.2f} seconds")
-        #print("----------------------------Post created successfully----------------------------")
-        # wait for a random interval of 1-3 minutes to seem more human
-        #interval = random.randint(300, 600)
-        #print(f"Waiting {interval} seconds...")
-        #time.sleep(interval)
+        elapsed_time = end_time - start_time
+        print(f"Elapsed time: {elapsed_time:.2f} seconds")
+        print("----------------------------Post created successfully----------------------------")
     else:
         print("Post ID", post_id, "has already been processed.")
