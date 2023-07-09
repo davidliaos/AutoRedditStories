@@ -53,7 +53,7 @@ def createTTS(post_id,input_text):
     concatenated_audio_data = b"".join(audio_data_list)
 
     if os.path.exists(os.path.join("mp3", output_file)):
-        print(f"{post_id} - Skipping MP4 creation for {post_id}. File already exists.")
+        print(f"{post_id} - Skipping MP3 creation for {post_id}. File already exists.")
         return None
     
     path = Path("mp3") / output_file
