@@ -1,5 +1,4 @@
-# READ 
-.gitignore didn't gitignore. Currently Uploading does not work, which is why it's commented out. I am unable to understand the fix for this but please feel free to look into it.
+Uploading is back and works again.
 
 # Auto Reddit Stories
 This Python script allows you to create videos from top posts on a subreddit, using text-to-speech and a collection of videos in a directory. The resulting video will contain the text from the post, spoken by a virtual assistant, with a background video.
