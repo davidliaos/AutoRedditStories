@@ -1,18 +1,18 @@
-posts/
-mp3/
-mp4/
-srt/
-results/
-videos/
-wav/
-venv/
-token.json
-.env 
-.DS_Store
-_pycache__/
-post_ids.txt
-.gitignore
-.DS_Store
-__pycache__/googledrive.cpython-310.pyc
-__pycache__/texttospeech.cpython-310.pyc
-__pycache__/videocreation.cpython-310.pyc
+# Ignore everything
+*
+
+# Don't ignore these files
+!/.gitignore
+!/README.md
+!/googledrive.py
+!/main.py
+!/package.json
+!/post_ids.txt
+!/requirements.txt
+!/subtitles.py
+!/textprocess.py
+!/texttospeech.py
+!/uploader.py
+!/utils.py
+!/videocreation.py
+!/x_bogus_x.py
