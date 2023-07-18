@@ -24,7 +24,7 @@ The script uses the PRAW (Python Reddit API Wrapper) library to access Reddit's 
 Use text-to-speech to convert the post's text into an MP3 file.
 Choose a random video from the videos directory and concatenate it with the MP3 file using the moviepy library.
 Save the resulting video as an MP4 file.
-Use Speech to Text to generate subtitles, not sure if we can use the prior script to make this more accurate.
+Use Whisper Speech to Text to generate subtitles, not sure if we can use the prior script to make this more accurate.
 
 # Limitations
 This is obviously exclusively for text posts.
