@@ -36,6 +36,6 @@ The quality of the TTS is quite inconsistant, and occasionally varies in speed(?
 2. Threading since transcription takes a while
 
 ## Acknowledgements 
-https://github.com/abdeladim-s/subsai
-https://github.com/546200350/TikTokUploder
-https://github.com/Weilbyte/tiktok-tts
+- https://github.com/abdeladim-s/subsai
+- https://github.com/546200350/TikTokUploder
+- https://github.com/Weilbyte/tiktok-tts
